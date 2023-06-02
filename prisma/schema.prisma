@@ -9,3 +9,33 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+model Game {
+  id        Int     @id @default(autoincrement())
+  player1Id String
+  player2Id String
+  board     String
+  winner    String  @default("")
+  draw      Boolean @default(false)
+  Player    Player? @relation(fields: [playerId], references: [id])
+  playerId  Int?
+  Move      Move[]
+}
+
+model Player {
+  id   Int    @id @default(autoincrement())
+  name String
+  game Game[]
+  Move Move[]
+}
+
+model Move {
+  id        Int      @id @default(autoincrement())
+  gameId    Int
+  game      Game     @relation(fields: [gameId], references: [id])
+  playerId  Int
+  player    Player   @relation(fields: [playerId], references: [id])
+  position  Int // Position on the board where the move is made (0-8 for a 3x3 board)
+  symbol    String // "X" or "O"
+  createdAt DateTime @default(now())
+}
