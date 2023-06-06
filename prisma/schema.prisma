@@ -23,10 +23,10 @@ model Game {
 }
 
 model Player {
-  id   Int    @id @default(autoincrement())
-  name String
-  game Game[]
-  Move Move[]
+  id       Int    @id @default(autoincrement())
+  username String @unique
+  game     Game[]
+  Move     Move[]
 }
 
 model Move {
