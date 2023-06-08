@@ -1,3 +1,4 @@
+import { Logger } from '@nestjs/common';
 import {
   SubscribeMessage,
   WebSocketGateway,
@@ -10,14 +11,21 @@ import {
 import { MoveService } from 'src/move/move.service';
 import { GameService } from './game.service';
 import { PlayerService } from 'src/player/player.service';
+import { Server } from 'socket.io';
 
 @WebSocketGateway()
 export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
+  private logger: Logger = new Logger('AppGateway');
+
   constructor(
     private gameService: GameService,
     private moveService: MoveService,
     private playerService: PlayerService,
   ) {}
+
+  afterInit(server: Server) {
+    this.logger.log('Init');
+  }
 
   handleConnection(client: any, ...args: any[]) {
     console.log(`Client connected: ${client.id}`);
@@ -32,7 +40,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
   async handleJoinGame(client: any, payload: any): Promise<WsResponse<any>> {
     try {
       // payload might include the gameId and playerId
-
+      this.logger.log(payload);
       const player = await this.playerService.getPlayer(payload.playerId);
       if (!player) {
         throw new WsException('Player not found');
